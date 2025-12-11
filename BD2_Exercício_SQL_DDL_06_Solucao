@@ -1,0 +1,46 @@
+--BD2 - 2o Bim - Atividade de SQL - Exercícios de DDL - Tabela_Trigger_Sequence
+
+/*
+Detalhes complementares:
+- O script DDL deve ter compatibilidade com o SGBDR Oracle 10g.
+- Todas as colunas são obrigatórias.
+- A chave primária (PK) da tabela (LOG_ALTERACOES.ID_LOG) deve ser gerado
+automaticamente quando das inserções de dados (utilizar SEQUENCE e TRIGGER
+BEFORE INSERT).
+- A sequence será básica (incremento de um, começando com 1,com o seguinte
+nome: SEQ_ID_LOG_ALTERACOES.
+- A trigger (BEFORE INSERT) terá o seguinte nome: TRG_LOG_ALTR_BI. E não
+pode permitir a inserção manual de valores para o ID_LOG, emitindo a seguinte
+mensagem caso haja a tentativa: 'Não é permitido inserir manualmente o ID'
+
+*/
+
+
+-- RESOLUÇÃO----------
+
+-- CRIAÇÃO DA TABELA---
+DROP TABLE log_alteracoes ;
+CREATE TABLE log_alteracoes
+(
+id_log NUMBER CONSTRAINT log_alteracoes_PK PRIMARY KEY,
+acao VARCHAR2(12) NOT NULL,
+tabela VARCHAR2(30) NOT NULL,
+data_evento DATE NOT NULL
+);
+
+-- CRIAÇÃO DA SEQUENCE-----
+DROP SEQUENCE seq_id_log_alteracoes;
+CREATE SEQUENCE seq_id_log_alteracoes START WITH 1 INCREMENT BY 1;
+
+-- CRIAÇÃO DA TRIGGER-----
+DROP TRIGGER trg_log_altr_bi;
+CREATE OR REPLACE TRIGGER trg_log_altr_bi
+BEFORE INSERT ON log_alteracoes
+FOR EACH ROW
+BEGIN
+IF :NEW.id_log IS NOT NULL THEN
+RAISE_APPLICATION_ERROR(-20001, 'Não é permitido inserir manualmente o ID');
+ELSE
+SELECT seq_id_log_alteracoes.NEXTVAL INTO :NEW.id_log FROM dual;
+END IF;
+END;
