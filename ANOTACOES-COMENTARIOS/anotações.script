@@ -1,0 +1,80 @@
+/*
+
+-----> DDL (Data Definition Language)
+
+* comandos que interagem com os OBJETOS ( tabrelas, viwes, functions, procedures etc)
+
+-> interação acontece assim: CREATE (cria) , ALTER (altera), DROP (exclui)
+
+
+-----> DML (Data Manipulation Lanuage)
+* comando que interagem com os DADOS 
+
+-> INSERT (adiciona dados) , UPDATE (modifica dados) , DELETE (deleta dados)
+
+
+-------> TCL (Transaction Control Language)
+* comandos que fazem o controle de transacoes
+
+-> COMMIT (salva alteracoes), ROLLBACK ( desfaz alteracoes)
+
+
+------------------------------------------------------
+
+m bancos de dados, DEFAULT é uma restrição (ou constraint) usada para atribuir um valor padrão 
+a uma coluna. Isso significa que, se uma nova linha for inserida na tabela e nenhum valor for explicitamente 
+fornecido para essa coluna específica, o valor predefinido será automaticamente utilizado
+
+
+CONSTRAINT é um mecanismo para impor regras de integridade e consistência aos dados armazenados nas tabelas.
+Tipos comuns de CONSTRAINT no Db2 incluem: 
+
+NOT NULL: Garante que uma coluna não pode ter um valor nulo (vazio).
+UNIQUE: Garante que todos os valores em uma coluna (ou combinação de colunas) sejam exclusivos.
+PRIMARY KEY: Identifica exclusivamente cada linha em uma tabela (combina NOT NULL e UNIQUE).
+FOREIGN KEY: Mantém a ligação entre dados em duas tabelas diferentes, garantindo a integridade referencial.
+CHECK: Impõe uma condição específica que todos os valores em uma coluna devem satisfazer (por exemplo, garantir que a idade seja sempre um número positivo). 
+
+
+TO_CHAR é uma função de conversão que formata valores de um tipo de dado para uma representação em formato de string (texto). 
+
+Exemplos de uso da função TO_CHAR no Db2:
+Formatar uma data/hora:
+
+SELECT TO_CHAR(CURRENT TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') FROM SYSIBM.SYSDUMMY1;
+
+
+Formatar um número:
+
+SELECT TO_CHAR(148.5, '999.990') FROM SYSIBM.SYSDUMMY1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/

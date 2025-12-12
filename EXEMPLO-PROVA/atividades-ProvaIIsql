@@ -1,0 +1,179 @@
+/*
+1) fazer uma query para selecionar os armazens ativos (situacao) localizsdos nos estados 
+de Sao Paulo ou Minas Gerais.
+* Mostrar: Nome do armazem e a cidade em que esta localizado
+* Ordenacao: Decrescente pelo nome do armazem 
+
+
+-------------------ORGANIZADNO-------------------
+--> o que a questao pede?
+* selecionar armazens ATIVOS --> situacao = 'ATIVO'
+  nome do armazem AS ARMAZEM
+  cidade
+* filtrar pelos localizados em SP e MG --> uf IN ('SP', 'MG')
+* ordenar por nome DESC
+
+--> CAMPOS DA TABELA
+- nome
+- cidade
+- uf
+- situacao
+
+*/
+
+
+SELECT
+  nome AS ARMAZEM,
+  cidade
+WHERE
+  situacao = 'ATIVO'
+  AND uf IN ('SP', 'MG')
+ORDER BY
+  nome DESC;
+  
+  
+--------------------------------------------------------------------------------
+
+
+/*
+2) fazer uma query para selecionar todas as saidas de mercadorias nos armazens.
+* Mostrar: nome do armazem AS ARMAZEM
+          descricao da mercadoria AS produto
+          data de saida AS DATA_SAIDA
+          quantidade saida AS QDE
+          
+* Ordernar: ascendente pela descricao da mercadoria E, dentro deste, descendente 
+pelo nome do armazem
+
+
+----------------------ORGANIZANDO----------------------
+--> tabelas pedidas:
+- MERCADORIA_SAIDA (principal)
+- ARMAZEM
+- MERCADORIA
+*/
+
+
+SELECT 
+-- escolher o que será mostrado:
+  A.nome AS ARMAZEM,
+  M.descricao AS PRODUTO,
+  S.data AS DATA_SAIDA,
+  S.quantidade AS QDE
+  
+-- de onde? tabela principal + apelido dado a ela
+from MERCADORIA_SAIDA S
+
+-- JOIN com ARMAZEM (A)
+INNER JOIN ARMAZEM A
+
+-- onde, a FK que esta na tabela princiapl, tenha o msm valor, que ela como pk na tabela armazem
+  ON S.ARM_ID = A.id
+
+-- JOIN com MERCADORIA
+INNER JOIN MERCADORIA M
+  ON S.MER_codigo = M.codigo
+  
+-- order by
+ORDER BY
+--asc - ordem crescente (A -> Z)
+  M.DESCRICAO ASC,
+-- desc - dentro de cada mercadoria, ordena os armazens de Z -> A (ordem decrescente)
+  A.nome DESC;
+  
+---------------------------------------------------------------------------------------
+
+/*
+3) fazer uma query para selecionar os ARMAZENS que NAO possuem SAIDAS em seus estoques.
+* Moatrar: codigo do armazem (CODIGO), nome do armazem (ARMAZEM) e situacao do armaszem (SIT)
+
+* Ordenacao: decrescente pela situacao do armazem
+
+----------------------------ORGANIZANDO----------------------------
+--> pegada principal da questao:
+
+ARMAZENS QUE NAO POSSUEM SAIDA  || logo, so posso saber quais nao tem saida, se nele,
+nao tiver mercadoria_saida. Somente olhar para armazem, n ta certo, pq ali n tem nenhuma
+informacao sobre saida!!!!
+
+--> tabelas  (se depende de outra tabela --> JOIN) :
+- ARMAZEM
+- MERCADORIA_SAIDA
+
+    --> usar LEFT JOIN para juncao das tabelas:   
+      * pega todas as colunas da esquerda (ARMAZEM)
+      * traz as linhas correspondentes da direita (MERCADORIA_SAIDA), e quando NAO existe correspondencia, aparece NULL.
+      
+                  --> pq n INNER JOIN? pq inner join, so retorna registros que combinam nas DUAS tabelas (n é oq querermos)
+                  --> pq n RIGHT JOIN? pq iria trazer todas as tabelas da direita. NUNCA USAR QUANDO QUER: “Encontre todos da tabela X e veja se tem correspondência na tabela Y”.
+                  --> pq n FULL JOIN? oq iria trazer TODOS os armazens e TODOAS as saidas, sem filtrar os armazens sem saida
+    
+
+--> mostrar o q da tabela?:
+- codigo do ARMAZEM AS (CODIGO)
+- nome do ARMAZEM AS (ARMAZEM)
+- situacao do ARMAZEM AS (SIT)
+
+--> ORDER BY SIT DESC;
+
+*/
+
+SELECT 
+  A.id AS CODIGO,
+  A.nome AS ARMAZEM,
+  A.situacao AS SIT
+FROM ARMAZEM A
+LEFT JOIN MERCADORIA_SAIDA S
+  ON S.ARM_id = A.id
+WHERE 
+  S.ARM_id IS NULL -- pegar os que NAO tem saida
+ORDER BY 
+  SIT DESC;
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*
+4) criar uma FUNCAO de nome FUNC_DIA99 que receba uma data qualquer, e retorne o dia da mesma com 2 algarismos.
+Se o fromato da data informada estiver errado, emitir mensagem de erro orientando o formato adequado 
+para a execucao da funcao
+
+---------------------------------------ORGANIZANDO---------------------------------------
+
+--> o que a funcao precisa fzr?
+- receber uma data como argumento
+- verificar se o formato é valido
+    se SIM -> retornar a msm data com 2 algarismos (ex: 01, 02...)
+    se NAO -> retornar mensagem de erro dizendo qual formato é aceito
+    
+--> como validar a data?
+- usar um bloco EXCEPTION>
+* tentamos converter a entrada para DATE usando o formato desejado
+  * se der ERRO, capturams e retornamos a mensagem
+  
+--> como extrair o dia com dois digitos?
+- usar to_char --> serve para fzr formatacao da saida dos dados 
+
+TO_CHAT(minha_data, 'DD')
+
+*/
+
+CREATE OR REPLACE FUNCTION FUNC_DIA99(p_data IN VARCHAR2)
+return VARCHAR2
+IS
+  v_data DATE;
+BEGIN
+  -- tentativa de converter 
+  v_data := TO_DATE(p_data, 'DD/MM/YYYY');
+  
+  -- retorna o dia com dois digitos
+  RETURN TO_CHAR(v_data, 'DD')
+
+EXCEPTION
+  WHEN OTHER THEN
+    RETURN 'ERRO: Informe a data no formato DD/MM/YYYY';
+  END;
+  
+---> COMO USAR A FUNCAO ACIMA?
+SELECT FUNC_DIA99('05/12/2024') FROM DUAL;
+
+
